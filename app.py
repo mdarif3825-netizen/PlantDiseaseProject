@@ -3,27 +3,9 @@ import os
 
 app = Flask(__name__)
 
-# Create static folder automatically if not present
+# Create static folder if not exists
 if not os.path.exists("static"):
     os.makedirs("static")
-
-# Temporary class names for demo deployment
-class_names = [
-    "Tomato Leaf",
-    "Potato Leaf",
-    "Pepper Leaf",
-    "Healthy Plant",
-    "Diseased Plant"
-]
-
-# Temporary medicine suggestions
-medicine_dict = {
-    "Tomato Leaf": "Use balanced fertilizer and check for fungal infection",
-    "Potato Leaf": "Use Copper Fungicide for protection",
-    "Pepper Leaf": "Use Copper-based Bactericide",
-    "Healthy Plant": "No medicine needed, continue normal care",
-    "Diseased Plant": "Inspect leaf and apply suitable fungicide"
-}
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -40,10 +22,9 @@ def index():
 
             filename = file.filename
 
-            # Temporary prediction logic for Render deployment
-            # (TensorFlow will be connected later)
-            result = "Diseased Plant"
-            medicine = medicine_dict.get(result, "General plant care recommended")
+            # Temporary prediction for deployment
+            result = "Plant detected successfully"
+            medicine = "AI prediction + medicine recommendation will be connected after deployment"
 
         else:
             result = "No file uploaded"
