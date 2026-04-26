@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Plant Disease Detection</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4fff4;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .container {
+            width: 600px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px #ccc;
+        }
+
+        h1 {
+            color: green;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        button {
+            padding: 12px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: green;
+            color: white;
+        }
+
+        .result {
+            margin-top: 30px;
+            background: #f0fff0;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        input {
+            margin: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌿 Live AI Plant Disease Detection</h1>
+
+    <button onclick="startCamera('environment')">Back Camera</button>
+    <button onclick="startCamera('user')">Front Camera</button>
+
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <br>
+        <button type="submit">Predict from Upload</button>
+    </form>
+
+    <button onclick="captureImage()">Capture & Predict</button>
+
+    {% if result %}
+    <div class="result">
+        <h2>Prediction Result</h2>
+        <p><strong>Disease:</strong> {{ result }}</p>
+        <p><strong>Suggested Medicine:</strong> {{ medicine }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+let video = document.getElementById("video");
+
+function startCamera(type) {
+    navigator.mediaDevices.getUserMedia({
+        video: {
+            facingMode: type
+        }
+    })
+    .then(function(stream) {
+        video.srcObject = stream;
+    })
+    .catch(function(err) {
+        alert("Camera access denied or not supported");
+    });
+}
+
+function captureImage() {
+    alert("Live camera capture connected successfully. Backend integration comes next.");
+}
+</script>
+
+</body>
+</html>
