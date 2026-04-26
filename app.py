@@ -1,17 +1,56 @@
 from flask import Flask, render_template, request
 import os
+import urllib.request
+import tensorflow as tf
+from tensorflow.keras.preprocessing import image
+import numpy as np
 
 app = Flask(__name__)
 
-# Create static folder if not exists
-if not os.path.exists("static"):
-    os.makedirs("static")
+MODEL_PATH = "model/plant_disease_model.h5"
+MODEL_URL = "PASTE_YOUR_HUGGINGFACE_LINK_HERE"
+
+if not os.path.exists("model"):
+    os.makedirs("model")
+
+if not os.path.exists(MODEL_PATH):
+    print("Downloading model...")
+    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+    print("Model downloaded successfully!")
+
+model = tf.keras.models.load_model(MODEL_PATH)
+
+class_names = [
+    "Pepper_bell_Bacterial_spot",
+    "Pepper_bell_healthy",
+    "Potato_Early_blight",
+    "Potato_healthy",
+    "Potato_Late_blight",
+    "Tomato_Target_Spot",
+    "Tomato_mosaic_virus",
+    "Tomato_YellowLeaf_Curl_Virus",
+    "Tomato_Bacterial_spot",
+    "Tomato_Early_blight",
+    "Tomato_healthy",
+    "Tomato_Late_blight",
+    "Tomato_Leaf_Mold",
+    "Tomato_Septoria_leaf_spot",
+    "Tomato_Spider_mites"
+]
+
+medicine_dict = {
+    "Potato_Early_blight": "Use Mancozeb Fungicide",
+    "Potato_Late_blight": "Use Copper Fungicide",
+    "Tomato_Early_blight": "Use Chlorothalonil Spray",
+    "Tomato_Late_blight": "Use Copper Oxychloride",
+    "Tomato_Leaf_Mold": "Use Sulfur Fungicide",
+    "Pepper_bell_Bacterial_spot": "Use Copper-based Bactericide"
+}
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = ""
     medicine = ""
-    plant_name = ""
 
     if request.method == "POST":
         file = request.files.get("file")
@@ -20,77 +59,21 @@ def index():
             filepath = os.path.join("static", file.filename)
             file.save(filepath)
 
-            filename = file.filename.lower()
+            img = image.load_img(filepath, target_size=(128, 128))
+            img_array = image.img_to_array(img) / 255.0
+            img_array = np.expand_dims(img_array, axis=0)
 
-            # Smart prediction for all common plants
-            if "tomato" in filename:
-                plant_name = "Tomato Plant"
-                result = "Tomato Early Blight"
-                medicine = "Use Chlorothalonil Spray"
+            prediction = model.predict(img_array)
+            predicted_class = class_names[np.argmax(prediction)]
 
-            elif "potato" in filename:
-                plant_name = "Potato Plant"
-                result = "Potato Late Blight"
-                medicine = "Use Copper Fungicide"
-
-            elif "pepper" in filename:
-                plant_name = "Pepper Plant"
-                result = "Pepper Bacterial Spot"
-                medicine = "Use Copper-based Bactericide"
-
-            elif "rice" in filename:
-                plant_name = "Rice Plant"
-                result = "Rice Blast Disease"
-                medicine = "Use Tricyclazole Fungicide"
-
-            elif "wheat" in filename:
-                plant_name = "Wheat Plant"
-                result = "Wheat Rust Disease"
-                medicine = "Use Propiconazole Fungicide"
-
-            elif "corn" in filename or "maize" in filename:
-                plant_name = "Corn Plant"
-                result = "Corn Leaf Blight"
-                medicine = "Use Mancozeb Fungicide"
-
-            elif "cotton" in filename:
-                plant_name = "Cotton Plant"
-                result = "Cotton Leaf Curl Disease"
-                medicine = "Use Imidacloprid Spray"
-
-            elif "sugarcane" in filename:
-                plant_name = "Sugarcane Plant"
-                result = "Red Rot Disease"
-                medicine = "Use Carbendazim Treatment"
-
-            elif "banana" in filename:
-                plant_name = "Banana Plant"
-                result = "Panama Wilt Disease"
-                medicine = "Use Carbendazim + Soil Treatment"
-
-            elif "mango" in filename:
-                plant_name = "Mango Plant"
-                result = "Anthracnose Disease"
-                medicine = "Use Copper Oxychloride Spray"
-
-            elif "healthy" in filename:
-                plant_name = "Healthy Plant"
-                result = "No Disease Detected"
-                medicine = "No medicine needed, continue normal care"
-
-            else:
-                plant_name = "Unknown Plant"
-                result = "Plant Disease Detected"
-                medicine = "Inspect leaf and use general fungicide"
-
-        else:
-            plant_name = "No Plant"
-            result = "No file uploaded"
-            medicine = "Please upload a plant leaf image"
+            result = predicted_class
+            medicine = medicine_dict.get(
+                predicted_class,
+                "General plant care recommended"
+            )
 
     return render_template(
         "index.html",
-        plant_name=plant_name,
         result=result,
         medicine=medicine
     )
