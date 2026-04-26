@@ -3,161 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Plant Disease Detection</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4fff4;
-            text-align: center;
-            padding: 30px;
-            margin: 0;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 650px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0px 0px 15px #ccc;
-        }
-
-        h1 {
-            color: green;
-            margin-bottom: 20px;
-        }
-
-        video {
-            width: 100%;
-            max-height: 400px;
-            border-radius: 12px;
-            margin-top: 20px;
-            background: #000;
-        }
-
-        canvas {
-            display: none;
-        }
-
-        button {
-            padding: 12px 20px;
-            margin: 10px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            background: green;
-            color: white;
-            font-size: 15px;
-        }
-
-        button:hover {
-            background: darkgreen;
-        }
-
-        .result {
-            margin-top: 30px;
-            background: #f0fff0;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: left;
-        }
-
-        input[type="file"] {
-            margin: 15px;
-        }
-
-        img {
-            width: 100%;
-            max-height: 300px;
-            object-fit: contain;
-            margin-top: 20px;
-            border-radius: 10px;
-        }
-
-        .preview-title {
-            margin-top: 20px;
-            font-weight: bold;
-            color: #333;
-        }
-    </style>
+    <title>Plant Disease Detection</title>
 </head>
 <body>
 
-<div class="container">
-    <h1>🌿 Live AI Plant Disease Detection</h1>
+<h1>🌿 AI Plant Disease Detection</h1>
 
-    <!-- Camera Buttons -->
-    <button type="button" onclick="startCamera('environment')">Back Camera</button>
-    <button type="button" onclick="startCamera('user')">Front Camera</button>
+<form method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <button type="submit">Predict</button>
+</form>
 
-    <!-- Live Camera -->
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas"></canvas>
-
-    <!-- Upload Form -->
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" accept="image/*">
-        <br>
-        <button type="submit">Predict from Upload</button>
-    </form>
-
-    <!-- Capture Button -->
-    <button type="button" onclick="captureImage()">Capture & Predict</button>
-
-    <!-- Captured Image Preview -->
-    <div class="preview-title" id="previewTitle"></div>
-    <img id="preview" style="display:none;">
-
-    <!-- Prediction Result -->
-    {% if result %}
-    <div class="result">
-        <h2>Prediction Result</h2>
-        <p><strong>Disease:</strong> {{ result }}</p>
-        <p><strong>Suggested Medicine:</strong> {{ medicine }}</p>
-    </div>
-    {% endif %}
-</div>
-
-<script>
-let video = document.getElementById("video");
-let canvas = document.getElementById("canvas");
-let preview = document.getElementById("preview");
-let previewTitle = document.getElementById("previewTitle");
-
-function startCamera(type) {
-    navigator.mediaDevices.getUserMedia({
-        video: {
-            facingMode: { ideal: type }
-        }
-    })
-    .then(function(stream) {
-        video.srcObject = stream;
-    })
-    .catch(function(error) {
-        alert("Camera access denied or not supported on this device/browser.");
-        console.log(error);
-    });
-}
-
-function captureImage() {
-    let context = canvas.getContext("2d");
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    let imageData = canvas.toDataURL("image/png");
-
-    preview.src = imageData;
-    preview.style.display = "block";
-    previewTitle.innerHTML = "Captured Image Preview";
-
-    alert("Image captured successfully! Backend live prediction can be connected next.");
-}
-</script>
+{% if result %}
+    <h2>Prediction Result</h2>
+    <p><strong>Disease:</strong> {{ result }}</p>
+    <p><strong>Medicine:</strong> {{ medicine }}</p>
+{% endif %}
 
 </body>
 </html>
