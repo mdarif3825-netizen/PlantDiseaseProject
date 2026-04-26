@@ -1,9 +1,5 @@
 flask
-tensorflow
 numpy
 pillow
 opencv-python
-matplotlib
-pandas
-scikit-learn
 gunicorn
