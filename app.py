@@ -8,7 +8,7 @@ import numpy as np
 app = Flask(__name__)
 
 MODEL_PATH = "model/plant_disease_model.h5"
-MODEL_URL = "PASTE_YOUR_HUGGINGFACE_LINK_HERE"
+MODEL_URL = "https://huggingface.co/mdasim3825/plant-disease-model/resolve/main/plant_disease_model.h5"
 
 if not os.path.exists("model"):
     os.makedirs("model")
